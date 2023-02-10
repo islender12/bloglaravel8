@@ -27,7 +27,7 @@
                             <div class="mb-3">
                                 <label for="" class="form-label">Titulo*</label>
                                 <input type="text" name="title" id="title" class="form-control" placeholder=""
-                                    aria-describedby="helpId">
+                                    aria-describedby="helpId" value="{{old('title')}}">
                                 <small id="helpId" class="text-muted">Titulo del Post</small>
                             </div>
                             <div class="mb-3">
@@ -38,12 +38,12 @@
                             </div>
                             <div class="mb-3">
                                 <label for="body" class="form-label">Contenido</label>
-                                <textarea class="form-control" name="body" id="body" rows="6"></textarea>
+                                <textarea class="form-control" name="body" id="body" rows="6">{{old('body')}}</textarea>
                             </div>
                             <div class="mb-3">
                                 <label for="" class="form-label">Contenido Embebido</label>
                                 <input type="text" name="iframe" id="iframe" class="form-control" placeholder=""
-                                    aria-describedby="helpId">
+                                    aria-describedby="helpId" value="{{old('iframe')}}">
                                 <small id="helpId" class="text-muted">Iframe</small>
                             </div>
                             <div class="mb-3">

@@ -2,25 +2,27 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Post;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\EditPostRequest;
 use App\Http\Requests\PostRequest;
-use Illuminate\Http\Request;
-use Intervention\Image\Facades\Image;
+use App\Models\Post;
+use App\Repositories\PostRepository;
+use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Http\RedirectResponse;
 
-// Nos permite eliminar una imagen o manipular la carpeta storage
-use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    private $postRepository;
+
+    public function __construct(PostRepository $postRepository)
+    {
+        $this->postRepository = $postRepository;
+    }
+
     public function index()
     {
-        $posts = Post::with('user:id,name')->get();
+        $posts = $this->postRepository->all();
 
         return view('admin.index', compact('posts'));
     }
@@ -30,7 +32,7 @@ class PostController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(): Renderable
     {
         return view('admin.create');
     }
@@ -41,43 +43,22 @@ class PostController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(PostRequest $request)
+    public function store(PostRequest $request): RedirectResponse
     {
-        // Salvar
-        $post = Post::create([
-            'user_id' => auth()->user()->id
-        ] + $request->all());
+        try {
 
-        //imagen
+            // Salvar
+            $post = new Post(
+                $request->all()
+                    + ['user_id' => auth()->id()]
+            );
+            $post = $this->postRepository->save($post);
+            // Retornar
+            return back()->with('status', 'Creado con Exito');
+        } catch (\Exception $e) {
 
-        // if ($request->file('imagen')) {
-        //     $post->imagen = $request->file('imagen')->store('posts', 'public');
-        //     $post->save();
-        // }
-
-        // Usamos paquete Intervention/image
-
-        if ($request->file('imagen')) {
-            $ruta = storage_path('app\public/' . $request->file('imagen')->store('posts', 'public'));
-            $nombre = 'posts/' . basename($ruta);
-            Image::make($request->file('imagen'))->resize(500, 300)->save($ruta);
-            $post->imagen = $nombre;
-            $post->save();
+            return redirect()->back()->with('error', $e->getMessage());
         }
-        // Retornar
-
-        return back()->with('status', 'Creado con Exito');
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
     }
 
     /**
@@ -86,7 +67,7 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Post $post)
+    public function edit(Post $post): Renderable
     {
         return view('admin.edit', compact('post'));
     }
@@ -98,26 +79,27 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Post $post)
+    public function update(EditPostRequest $request, Post $post): RedirectResponse
     {
-        //
-        $post->update($request->all());
+        try {
 
-        if ($request->file('imagen')) {
-            if ($post->imagen) {
-                Storage::disk('public')->delete($post->imagen);
-                $ruta = storage_path('app\public/' . $request->file('imagen')->store('posts', 'public'));
-                $nombre = 'posts/' . basename($ruta);
-                // con resize le damos un tamaño de 800x400
-                Image::make($request->file('imagen'))->resize(500, 300)->save($ruta);
+            /**
+             * Usamos el mismo metodo save()
+             * y esto es porque tenemos dos parametros el primero los datos ($request)
+             * y el Segundo es el post que vamos a Actualizar
+             *
+             * ello lo logramos usando el metodo fill donde laravel compara los datos
+             * que tenemos en el objeto contra lo que recibimos en el request
+             * y solo actualiza los datos que son distintos (fueron modificados)
+             * y los actualiza en el objeto pero sin ser persitidos
+             */
+            $post->fill($request->all());
+            $post = $this->postRepository->save($post);
 
-                $post->image = $nombre;
-
-                $post->save();
-            }
+            return redirect()->route('posts.edit', $post->slug)->with('status', 'Actualizado Correctamente');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
         }
-
-        return redirect()->route('posts.edit', $post->slug)->with('status', 'Actualizado Correctamente');
     }
 
     /**
@@ -128,8 +110,8 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        Storage::disk('public')->delete($post->imagen);
-        $post->delete();
+
+        $this->postRepository->delete($post);
 
         return back()->with('status', 'Eliminado Correctamente');
     }
