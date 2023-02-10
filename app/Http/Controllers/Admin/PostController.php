@@ -2,27 +2,28 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Post;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\EditPostRequest;
 use App\Http\Requests\PostRequest;
+use App\Models\Post;
+use App\Repositories\PostRepository;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Intervention\Image\Facades\Image;
 
-// Nos permite eliminar una imagen o manipular la carpeta storage
-use Illuminate\Support\Facades\Storage;
+
 
 class PostController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index(): Renderable
+    private $postRepository;
+
+    public function __construct(PostRepository $postRepository)
     {
-        $posts = Post::with('user:id,name')->get();
+        $this->postRepository = $postRepository;
+    }
+
+    public function index()
+    {
+        $posts = $this->postRepository->all();
 
         return view('admin.index', compact('posts'));
     }
@@ -48,31 +49,18 @@ class PostController extends Controller
         try {
 
             // Salvar
-            $post = Post::create([
-                'user_id' => auth()->user()->id
-            ] + $request->all());
-
-            //imagen
-
-            // if ($request->file('imagen')) {
-            //     $post->imagen = $request->file('imagen')->store('posts', 'public');
-            //     $post->save();
-            // }
-
-            // Usamos paquete Intervention/image
-
-            if ($request->file('imagen')) {
-                $ruta = storage_path('app\public/' . $request->file('imagen')->store('posts', 'public'));
-                $nombre = 'posts/' . basename($ruta);
-                Image::make($request->file('imagen'))->resize(500, 300)->save($ruta);
-                $post->imagen = $nombre;
-                $post->save();
-            }
+            $post = new Post(
+                $request->all()
+                    + ['user_id' => auth()->id()]
+            );
+            $post = $this->postRepository->save($post);
             // Retornar
-
             return back()->with('status', 'Creado con Exito');
+
         } catch (\Exception $e) {
+
             return redirect()->back()->with('error', $e->getMessage());
+
         }
     }
 
@@ -94,7 +82,7 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Post $post): RedirectResponse
+    public function update(EditPostRequest $request, Post $post): RedirectResponse
     {
         try {
             $post->update($request->all());
