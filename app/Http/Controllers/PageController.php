@@ -9,8 +9,8 @@ class PageController extends Controller
 {
     public function posts()
     {
-        $posts = Post::with('user')->latest()->paginate(5);
-
+        $posts = Post::with('user:id,name')->latest()->paginate(5);
+        // dd($posts);
         return view('posts', compact('posts'));
     }
 
