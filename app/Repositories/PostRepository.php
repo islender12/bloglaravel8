@@ -9,10 +9,11 @@ use Illuminate\Support\Facades\Storage;
 
 class PostRepository
 {
-    private $model;
+    private $model, $imageRepository;
 
-    public function __construct()
+    public function __construct(ImageRepository $imageRepository)
     {
+        $this->imageRepository = $imageRepository;
         $this->model = new Post();
     }
 
@@ -51,14 +52,10 @@ class PostRepository
             // Si existe una Imagen del posts y quiero actualizar
             // Le indicamos que elimine la anterior
             if (!empty($oldImage)) {
-                Storage::disk('public')->delete($oldImage);
+                $this->imageRepository->deleteImage($post->imagen);
             }
-
-            $ruta = storage_path('app\public/' . $post->imagen->store('posts', 'public'));
-            $nombre = 'posts/' . basename($ruta);
-            // Usamos paquete Intervention/image (Image::make)
-            Image::make($post->imagen)->resize(500, 300)->save($ruta);
-            $post->imagen = $nombre;
+            $nombreImagen = $this->imageRepository->saveImage($post->imagen);
+            $post->imagen = $nombreImagen;
             $post->save();
         }
 
@@ -68,7 +65,7 @@ class PostRepository
     public function delete(Post $post)
     {
         if ($post->imagen) {
-            Storage::disk('public')->delete($post->imagen);
+            $this->imageRepository->deleteImage($post->imagen);
         }
         $post->delete();
         return $post;
