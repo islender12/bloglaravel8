@@ -60,7 +60,7 @@
                                 <a href="{{ route('posts.index') }}" class="nav-link">Articulos</a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('posts.index') }}" class="nav-link">Contacto</a>
+                                <a href="{{ route('contactanos.index') }}" class="nav-link">Contacto</a>
                             </li>
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
