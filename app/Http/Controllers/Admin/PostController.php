@@ -97,7 +97,9 @@ class PostController extends Controller
             $post->fill($request->all());
             $post = $this->postRepository->save($post);
 
-            return redirect()->route('posts.edit', $post->slug)->with('status', 'Actualizado Correctamente');
+            // return redirect()->route('posts.edit', $post->slug)->with('status', 'Actualizado Correctamente');
+            return to_route('posts.edit', $post->slug)->with('status', 'Actualizado Correctamente');
+
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
