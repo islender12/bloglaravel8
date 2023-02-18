@@ -52,6 +52,7 @@ class PostController extends Controller
                 $request->all()
                     + ['user_id' => auth()->id()]
             );
+
             $post = $this->postRepository->save($post);
             // Retornar
             return back()->with('status', 'Creado con Exito');

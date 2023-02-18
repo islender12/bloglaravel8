@@ -7,8 +7,9 @@
                 @foreach ($posts as $post)
                     <div class="card my-4 shadow">
                         <div class="card-body">
+                            {{-- @dd($post->imagen) --}}
                             @if ($post->imagen)
-                                <img src="{{ $post->get_imagen }}" alt="{{ $post->title }}"
+                                <img src="{{ $post->imagen }}" alt="{{ $post->title }}"
                                     class="card-img-top img-thumbnail">
                             @endif
                             @if ($post->iframe)
@@ -18,7 +19,7 @@
                             @endif
                             <h5 class="card-title fw-bolder mt-4">{{ $post->title }}</h5>
                             <p class="card-text">
-                                {{ $post->get_excerpt }}...
+                                {{ $post->get_excerpt }}
                                 <a class="d-block" href="{{ route('post', $post) }}"> Leer Más</a>
                             </p>
                             <p class="text-muted mb-0">

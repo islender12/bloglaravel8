@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Post extends Model
 {
@@ -41,15 +43,24 @@ class Post extends Model
         return $this->belongsTo(User::class);
     }
 
+
     public function getGetExcerptAttribute($key)
     {
         return substr($this->body, 0, 150);
     }
 
-    public function getGetImagenAttribute($key)
+    protected function body(): Attribute
     {
-        if ($this->imagen) {
-            return url("storage/$this->imagen");
-        }
+        return new Attribute(
+            set: fn ($value) => ucfirst($value)
+        );
+    }
+
+    public function imagen(): Attribute
+    {
+        return new Attribute(
+            get: fn ($value) => $value ? url("storage/$value") : false,
+            set: fn($value) => $value
+        );
     }
 }
