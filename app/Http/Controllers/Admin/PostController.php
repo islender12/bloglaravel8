@@ -84,7 +84,7 @@ class PostController extends Controller
         try {
 
             /**
-             * Usamos el mismo metodo save()
+             * Usamos el mismo metodo save().
              * y esto es porque tenemos dos parametros el primero los datos ($request)
              * y el Segundo es el post que vamos a Actualizar
              *
