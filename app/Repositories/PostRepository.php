@@ -44,7 +44,7 @@ class PostRepository
          * ## Es un objeto siempre y cuando la imagen se cargue desde el formulario
          */
 
-        if (is_string($post->imagen) || is_null($post->imagen)) {
+        if (is_string($post->imagen) || !$post->imagen) {
             $post->save();
         } elseif (is_object($post->imagen)) {
 

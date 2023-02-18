@@ -2,8 +2,9 @@
 
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\SendMail;
 use Illuminate\Support\Facades\Route;
-
+use Illuminate\Support\Facades\Auth;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -15,10 +16,20 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+
 Route::get('/', [PageController::class, 'posts'])->name('home');
+
 Route::get('blog/{post}', [PageController::class, 'post'])->name('post');
+
 
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+// Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::resource('posts', PostController::class)->middleware('auth')->except('show');
+
+Route::middleware(['auth'])->controller(SendMail::class)->group(
+    function () {
+        Route::post('contactanos', 'store')->name('contactanos.store');
+        Route::get('contactanos', 'index')->name('contactanos.index');
+    }
+);

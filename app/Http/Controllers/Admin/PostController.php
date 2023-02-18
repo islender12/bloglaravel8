@@ -52,6 +52,7 @@ class PostController extends Controller
                 $request->all()
                     + ['user_id' => auth()->id()]
             );
+
             $post = $this->postRepository->save($post);
             // Retornar
             return back()->with('status', 'Creado con Exito');
@@ -96,7 +97,9 @@ class PostController extends Controller
             $post->fill($request->all());
             $post = $this->postRepository->save($post);
 
-            return redirect()->route('posts.edit', $post->slug)->with('status', 'Actualizado Correctamente');
+            // return redirect()->route('posts.edit', $post->slug)->with('status', 'Actualizado Correctamente');
+            return to_route('posts.edit', $post->slug)->with('status', 'Actualizado Correctamente');
+
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
