@@ -7,22 +7,27 @@ use Intervention\Image\Facades\Image;
 // Nos permite eliminar una imagen o manipular la carpeta storage
 use Illuminate\Support\Facades\Storage;
 
-class PostRepository
+class PostRepository extends BaseRepository
 {
-    private $model, $imageRepository;
+    private  $imageRepository;
+    const RELATIONS = [
+        'user:id,name'
+    ];
 
-    public function __construct(ImageRepository $imageRepository)
+    public function __construct(Post $post, ImageRepository $imageRepository)
     {
+        parent::__construct($post,self::RELATIONS);
         $this->imageRepository = $imageRepository;
-        $this->model = new Post();
     }
 
-    public function all()
-    {
-        return $this->model->with('user:id,name')->get();
-    }
+    // // EL metodo all lo obtenemos del repositorio base
+    // En este caso tenemos la posilibidad
+    // public function all()
+    // {
+    //     return $this->model->with('user:id,name')->get();
+    // }
 
-    public function save(Post $post)
+    public function save($post)
     {
         //imagen
 
@@ -62,7 +67,8 @@ class PostRepository
         return $post;
     }
 
-    public function delete(Post $post)
+    // Sobreescribimos el metodo delete del Controlador Base
+    public function delete($post)
     {
         if ($post->imagen) {
             $this->imageRepository->deleteImage($post->imagen);

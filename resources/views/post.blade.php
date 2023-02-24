@@ -7,7 +7,7 @@
                 <div class="card my-4 shadow">
                     <div class="card-body">
                         @if ($post->imagen)
-                            <img src="{{ $post->get_imagen }}" alt="{{ $post->title }}" class="card-img-top img-thumbnail">
+                            <img src="{{ $post->imagen }}" alt="{{ $post->title }}" class="card-img-top img-thumbnail">
                         @endif
                         @if ($post->iframe)
                             <div class="ratio ratio-16x9 mx-auto">
