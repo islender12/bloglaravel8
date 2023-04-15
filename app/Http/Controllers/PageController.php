@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use App\Repositories\PostRepository;
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
 
 class PageController extends Controller
 {
@@ -25,5 +28,14 @@ class PageController extends Controller
     public function post(Post $post): Renderable
     {
         return view('post', compact('post'));
+    }
+
+    public function searchPost(Request $request):Renderable
+    {
+        $busqueda = $request->input('search');
+
+        $posts = $this->postRepository->search($busqueda);
+        // $posts = Post::where("title", "like", "%$busqueda%")->orWhere("body", "like", "%$busqueda%")->paginate(10);
+        return view('searchPost', compact('posts'));
     }
 }

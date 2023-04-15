@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use Illuminate\Database\Eloquent\Model;
+
 class BaseRepository
 {
 
@@ -20,17 +21,15 @@ class BaseRepository
     {
         $query = $this->model;
 
-        if(!empty($this->relations))
-        {
+        if (!empty($this->relations)) {
             $query = $query->with($this->relations);
         }
 
-        if($paginate){
-          return $query->latest()->paginate($paginate);
+        if ($paginate) {
+            return $query->latest()->paginate($paginate);
         }
 
         return $query->get();
-
     }
 
     public function save(Model $model)
@@ -43,5 +42,16 @@ class BaseRepository
     {
         $model->delete();
         return $model;
+    }
+
+    /**
+     * @param $search string / Busqueda a Realizar desde el input de busqueda
+     */
+    public function search($search)
+    {
+        $query = $this->model;
+        $busqueda = "%$search%";
+        return $query->where("title", "like", $busqueda)->orWhere("body", "like", "$busqueda")->paginate(10);
+        
     }
 }

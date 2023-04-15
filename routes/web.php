@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Auth;
 
 
 Route::get('/', [PageController::class, 'posts'])->name('home');
+Route::get('search_post', [PageController::class, 'searchPost'])->name("post.search");
 
 Route::get('blog/{post}', [PageController::class, 'post'])->name('post');
 

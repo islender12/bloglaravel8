@@ -36,8 +36,15 @@
 
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <!-- Left Side Of Navbar -->
-                    <ul class="navbar-nav me-auto">
-
+                    <ul class="navbar-nav me-auto w-100 d-flex justify-content-center">
+                        <form action="{{route('post.search')}}" method="GET" class="w-50">
+                            <div class="input-group">
+                                <input type="search" id="search" name="search" class="form-control" />
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </form>
                     </ul>
 
                     <!-- Right Side Of Navbar -->
